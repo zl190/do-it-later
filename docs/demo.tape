@@ -1,11 +1,12 @@
-# demo.tape — deterministic README demo. Re-record: vhs docs/demo.tape
-# Uses a throwaway ledger (PM_LEDGER=mktemp); never touches a real one.
+# demo.tape — before/after contrast: the delta IS the product.
+# Scene 1 (without): a promise dies in silence. Scene 2 (with): same promise comes back.
+# Re-record: vhs docs/demo.tape   (throwaway ledger; engine output is real)
 Output docs/demo.gif
-Set FontSize 15
+Set FontSize 21
 Set Width 1000
-Set Height 620
-Set Padding 18
-Set TypingSpeed 30ms
+Set Height 480
+Set Padding 22
+Set TypingSpeed 25ms
 Set Theme "Catppuccin Mocha"
 
 Hide
@@ -13,32 +14,49 @@ Type `scan() { bash ~/.claude/skills/do-it-later/scripts/scan.sh "$@"; }`
 Enter
 Type `export PM_LEDGER=$(mktemp -d)/deferrals.tsv`
 Enter
-Type `scan add fix-flaky-timer --due 2026-08-15 --action "revisit the flaky timer test" --context "tests/timer.spec.ts; repro: run 20x; suspect: fake-clock drift" --source "PR #88 review: 'we will fix it later'"`
-Enter
-Type `scan add q4-writeup --due 2026-12-01 --action "write the Q4 wrap-up" --context "material in blog/drafts/"`
-Enter
 Type "clear"
 Enter
 Show
 
-Type `# every session starts by asking: what did we promise?`
+Type@55ms `# WITHOUT do-it-later`
 Enter
-Type `scan scan`
+Sleep 800ms
+Type@55ms `#   you: "the dark-mode toggle? let's do it later."`
 Enter
-Sleep 4s
-
-Type `# "later" without a machine-decidable condition? rejected:`
+Sleep 1.5s
+Type@120ms `#   ...weeks pass...`
 Enter
-Type `scan add someday-refactor --action "refactor once the architecture matures"`
+Sleep 1.5s
+Type@120ms `#   (nothing comes back. you never even notice.)`
 Enter
 Sleep 2.8s
 
-Type `# trip it -> work it -> close it`
+Hide
+Type "clear"
 Enter
-Type `scan fire fix-flaky-timer`
+Show
+Type@55ms `# WITH do-it-later`
 Enter
-Sleep 3.2s
+Sleep 800ms
+Type@55ms `#   you: "the dark-mode toggle? let's do it later."`
+Enter
+Sleep 1.2s
+Type `scan add dark-mode --due 2026-09-01 --action "add the dark-mode toggle (issue #12)"`
+Enter
+Sleep 2.2s
 
-Type `scan done fix-flaky-timer && scan scan`
+Hide
+Type `sed -i.bak 's/2026-09-01/2026-08-01/' "$PM_LEDGER"`
 Enter
-Sleep 3.5s
+Type "clear"
+Enter
+Show
+Type@55ms `#   ...weeks pass... a NEW session opens:`
+Enter
+Sleep 1.5s
+Type `scan scan`
+Enter
+Sleep 4s
+Type@120ms `#   it came back by itself.`
+Enter
+Sleep 3s

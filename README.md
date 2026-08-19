@@ -8,12 +8,16 @@
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
-Sessions end, context dies, and every *"revisit after the refactor"* dies with them —
-silently, so you never even know how many promises you lost. Reminding the model to
-remember doesn't work ([the benchmarks are brutal](#related-work)). So this tool doesn't
-ask it to: *don't make the model remember — make the machine trip.* Commitments go into a
-plain-TSV ledger with a **machine-decidable condition** (a due date or a shell check), and
-**mechanical ignition surfaces** push them back into the conversation when the condition
+You know *read-it-later* apps — and you know where those lists go to die. Agent
+conversations have the same reflex (*"revisit after the refactor"*) with a worse
+graveyard: sessions end, context dies, and the promise disappears so silently you never
+even know it existed. Reminding the model to remember doesn't work
+([the benchmarks are brutal](#related-work)).
+
+**Do It Later** is that same one-keystroke reflex with the famous flaw fixed: **nothing on
+this list can die quietly.** *Don't make the model remember — make the machine trip.*
+Every commitment carries a **machine-decidable condition** (a due date or a shell check),
+and **mechanical ignition surfaces** push it back into the conversation when the condition
 holds. Ignition rate = event rate, independent of model recall.
 
 The name is the crime: the phrase this tool polices is the phrase that invokes it.
@@ -38,9 +42,9 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   bad dates — all surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
 
-## 60-second demo
+## Without it / with it
 
-<p align="center"><img src="docs/demo.gif" width="820" alt="rejecting a vibes-based deferral, scanning due commitments, firing and closing one"></p>
+<p align="center"><img src="docs/demo.gif" width="820" alt="without: a deferred promise silently dies; with: the same promise comes back on its own in a new session"></p>
 
 <details><summary>Abridged real transcript (text)</summary>
 
