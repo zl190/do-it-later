@@ -8,19 +8,18 @@
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
-Your own "later" has containers — issues, notes, *read-it-later*. But when the **agent**
-says *"I'll revisit this once the refactor lands"*, that promise lives nowhere: not an
-issue, not a file, just tokens in a context window that's about to die. The session ends
-and the promise was never real — you don't even register it as one. Asking the model to
-remember doesn't work ([the benchmarks are brutal](#related-work)). So first, this gives
-the agent's promises the queue they never had.
+**Agent promises are cheap.** *"I'll revisit this once the refactor lands"* is not an
+issue, not a file — just tokens in a context window that's about to die. The session ends;
+the promise was never real. Asking the model to remember doesn't work
+([the benchmarks are brutal](#related-work)). So first, this gives the agent's promises
+the queue they never had.
 
-But everyone also knows why read-it-later lists die anyway: **they have no trigger** — the
-list just waits for you to remember it exists. So this queue ships with the half that was
-always missing: every commitment carries a **machine-decidable condition** (a due date or
-a shell check), and **mechanical ignition surfaces** fire it back into the conversation
-when the condition holds. *Don't make the model remember — make the machine trip.*
-Ignition rate = event rate, independent of model recall.
+Humans at least park their "later" somewhere — and everyone knows how *read-it-later*
+lists still die: **no trigger**. The list just waits for you to remember it exists. So
+this queue ships with the missing half: every commitment carries a **machine-decidable
+condition** (a due date or a shell check), and **mechanical ignition surfaces** fire it
+back into the conversation when the condition holds. *Don't make the model remember —
+make the machine trip.* Ignition rate = event rate, independent of model recall.
 
 The name is the crime: the phrase this tool polices is the phrase that invokes it.
 
