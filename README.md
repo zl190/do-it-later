@@ -56,6 +56,19 @@ fresh session gets tripped and proposes disposition (do / re-condition / kill), 
 `done` turns the scan green. Re-record it anytime: `vhs docs/demo-real.tape`; the hero
 storyboard above is `vhs docs/demo.tape`.
 
+## The queue has a face
+
+```bash
+open "$(bash ~/.claude/skills/do-it-later/scripts/scan.sh face)"
+```
+
+<p align="center"><img src="docs/face.png" width="820" alt="the ledger rendered as a page: a red DUE card on top, pending cards with conditions and stakes, a dimmed done card, and a fire command on every row"></p>
+
+One command renders the ledger as a self-contained HTML page: due first and red, every
+row carrying its condition, stakes, context and a ready-to-paste `fire` command. The TSV
+stays the single source of truth; the page is a throwaway projection, regenerate it any
+time.
+
 ## Install
 
 Requires: bash, awk, python3 (install script only). Claude Code as the host harness.

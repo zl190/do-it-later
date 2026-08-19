@@ -223,13 +223,63 @@ cmd_doctor() {
   printf -- '-- doctor: clean --\n'
 }
 
+# face: render the ledger as a self-contained HTML page (a human face for the queue).
+# The TSV stays the single source of truth; this is a derived projection, regenerate at
+# will. Zero dependencies, dark, one file.
+esc() { printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'; }
+
+cmd_face() {
+  ensure_ledger
+  local out="${1:-${TMPDIR:-/tmp}/pm-ledger-face.html}"
+  local id due check action context stakes surface source status created
+  local rows_due='' rows_pending='' rows_closed='' n_due=0 n_pending=0 n_closed=0
+  while IFS='	' read -r id due check action context stakes surface source status created; do
+    local cond chip cls
+    if [ "$due" != "-" ]; then cond="due $due"; else cond="when: $(esc "$check")"; fi
+    case "$status" in
+      pending)
+        if [ "$due" = "-" ] && [ "$check" = "-" ]; then chip=INVALID; cls=invalid
+        elif fired_p "$due" "$check"; then chip=DUE; cls=due
+        else chip=pending; cls=pending
+        fi ;;
+      *) chip="$status"; cls=closed ;;
+    esac
+    local row
+    row="<div class='row $cls'><span class='chip'>$chip</span><div class='body'><div class='top'><code>$(esc "$id")</code><span class='cond'>$cond · $stakes</span></div><div class='act'>$(esc "$action")</div><div class='ctx'>$(esc "$context") <span class='src'>[$(esc "$source")]</span></div></div><code class='fire'>fire $(esc "$id")</code></div>"
+    case "$cls" in
+      due|invalid) rows_due="$rows_due$row"; n_due=$((n_due + 1)) ;;
+      pending)     rows_pending="$rows_pending$row"; n_pending=$((n_pending + 1)) ;;
+      *)           rows_closed="$rows_closed$row"; n_closed=$((n_closed + 1)) ;;
+    esac
+  done < <(read_rows)
+  {
+    printf '<!doctype html><meta charset="utf-8"><title>pm-ledger</title><style>'
+    printf 'body{background:#1e1e2e;color:#cdd6f4;font:15px/1.45 -apple-system,system-ui,sans-serif;max-width:880px;margin:32px auto;padding:0 20px}'
+    printf 'h1{font-size:19px}h1 small{color:#7f849c;font-weight:400;margin-left:10px}'
+    printf '.row{display:flex;gap:12px;align-items:flex-start;background:#181825;border:1px solid #313244;border-radius:9px;padding:12px 14px;margin:9px 0}'
+    printf '.chip{flex:0 0 64px;text-align:center;font-size:11px;font-weight:700;border-radius:99px;padding:3px 0;background:#313244;color:#a6adc8}'
+    printf '.due .chip{background:#f38ba8;color:#1e1e2e}.invalid .chip{background:#f9e2af;color:#1e1e2e}.closed{opacity:.45}'
+    printf '.body{flex:1;min-width:0}.top{display:flex;justify-content:space-between;gap:8px}'
+    printf '.top code{color:#89b4fa}.cond{color:#7f849c;font-size:12.5px}'
+    printf '.act{margin-top:2px}.ctx{color:#7f849c;font-size:12.5px;margin-top:2px}.src{color:#585b70}'
+    printf ".fire{flex:0 0 auto;align-self:center;font-size:11.5px;color:#a6e3a1;border:1px solid #313244;border-radius:6px;padding:3px 8px}"
+    printf 'footer{color:#585b70;font-size:12px;margin-top:18px}</style>'
+    printf '<h1>pm-ledger <small>%s due/invalid · %s pending · %s closed · %s</small></h1>' "$n_due" "$n_pending" "$n_closed" "$TODAY"
+    printf '%s%s%s' "$rows_due" "$rows_pending" "$rows_closed"
+    printf '<footer>projection of %s — the TSV is the truth; regenerate with <code>scan.sh face</code>. verbs: fire · done · kill · add · doctor</footer>' "$(esc "$LEDGER")"
+  } > "$out"
+  log_usage "cmd=face	due=$n_due	pending=$n_pending"
+  printf '%s\n' "$out"
+}
+
 case "${1:-scan}" in
   scan) cmd_scan ;;
   list) cmd_list ;;
+  face) shift; cmd_face "${1:-}" ;;
   fire) shift; cmd_fire "${1:?usage: fire <id>}" ;;
   done) shift; cmd_done "${1:?usage: done <id>}" ;;
   kill) shift; cmd_kill "$@" ;;
   add) shift; cmd_add "$@" ;;
   doctor) cmd_doctor ;;
-  *) printf 'usage: scan.sh {scan|list|fire <id>|done <id>|kill <id> <reason>|add <id> ...|doctor}\n' >&2; exit 2 ;;
+  *) printf 'usage: scan.sh {scan|list|face [out.html]|fire <id>|done <id>|kill <id> <reason>|add <id> ...|doctor}\n' >&2; exit 2 ;;
 esac
