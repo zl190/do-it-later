@@ -45,17 +45,6 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   bad dates. All surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
 
-## The real thing, unscripted
-
-<p align="center"><img src="docs/demo-real.gif" width="860" alt="a real claude -p session: the ledger shows an overdue row, the model's actual reply picks it up, scan done turns the ledger green"></p>
-
-A real ledger file, a real `claude -p` session, the model's actual words; nothing staged
-except trimming the model's thinking wait. It even surfaces this rig's own parked briefs
-mid-reply: real environment, not a set. The loop on camera: `list` shows a `DUE!` row, a
-fresh session gets tripped and proposes disposition (do / re-condition / kill), and
-`done` turns the scan green. Re-record it anytime: `vhs docs/demo-real.tape`; the hero
-storyboard above is `vhs docs/demo.tape`.
-
 ## The queue has a face
 
 ```bash
