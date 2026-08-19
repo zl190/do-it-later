@@ -8,17 +8,18 @@
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
-You know *read-it-later* apps — and you know where those lists go to die. Agent
-conversations have the same reflex (*"revisit after the refactor"*) with a worse
-graveyard: sessions end, context dies, and the promise disappears so silently you never
-even know it existed. Reminding the model to remember doesn't work
-([the benchmarks are brutal](#related-work)).
+Humans have had *read-it-later* for fifteen years. Agents never got a *do-it-later* —
+when you tell Claude Code *"revisit after the refactor"*, there is no list at all: the
+session ends and the promise evaporates so silently you never know it existed. Reminding
+the model to remember doesn't work ([the benchmarks are brutal](#related-work)). So first,
+this gives agents the queue they never had.
 
-**Do It Later** is that same one-keystroke reflex with the famous flaw fixed: **nothing on
-this list can die quietly.** *Don't make the model remember — make the machine trip.*
-Every commitment carries a **machine-decidable condition** (a due date or a shell check),
-and **mechanical ignition surfaces** push it back into the conversation when the condition
-holds. Ignition rate = event rate, independent of model recall.
+But everyone also knows why read-it-later lists die anyway: **they have no trigger** — the
+list just waits for you to remember it exists. So this queue ships with the half that was
+always missing: every commitment carries a **machine-decidable condition** (a due date or
+a shell check), and **mechanical ignition surfaces** fire it back into the conversation
+when the condition holds. *Don't make the model remember — make the machine trip.*
+Ignition rate = event rate, independent of model recall.
 
 The name is the crime: the phrase this tool polices is the phrase that invokes it.
 
