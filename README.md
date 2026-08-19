@@ -62,12 +62,13 @@ storyboard above is `vhs docs/demo.tape`.
 open "$(bash ~/.claude/skills/do-it-later/scripts/scan.sh face)"
 ```
 
-<p align="center"><img src="docs/face.png" width="820" alt="the ledger rendered as a page: a red DUE card on top, pending cards with conditions and stakes, a dimmed done card, and a fire command on every row"></p>
+<p align="center"><img src="docs/face-cycle.gif" width="820" alt="the queue page through one promise lifecycle: it enters as a pending card, turns DUE and red when the condition is met, and leaves dimmed as done"></p>
 
-One command renders the ledger as a self-contained HTML page: due first and red, every
-row carrying its condition, stakes, context and a ready-to-paste `fire` command. The TSV
-stays the single source of truth; the page is a throwaway projection, regenerate it any
-time.
+One command renders the ledger as a self-contained HTML page, and this is a promise's
+whole life on it: it ENTERS the queue when the agent says "later", turns red and jumps to
+the top when its condition is met, and LEAVES dimmed once the work is done. Due first,
+every row carrying its condition, stakes, context and a ready-to-paste `fire` command.
+The TSV stays the single source of truth; the page is a throwaway projection.
 
 ## Install
 
