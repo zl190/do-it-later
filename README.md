@@ -40,7 +40,11 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   bad dates — all surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
 
-## 60-second demo (abridged real transcript)
+## 60-second demo
+
+<p align="center"><img src="docs/demo.gif" width="820" alt="rejecting a vibes-based deferral, scanning due commitments, firing and closing one"></p>
+
+<details><summary>Abridged real transcript (text)</summary>
 
 ```console
 $ scan.sh add someday-refactor --action "refactor once the architecture matures"
@@ -61,6 +65,10 @@ reply plans them first, closing verb included:
 > drift fix … then `scan.sh done fix-flaky-timer`.
 
 It didn't remember. It got tripped.
+
+</details>
+
+Re-record the GIF anytime: `vhs docs/demo.tape` (deterministic, throwaway ledger).
 
 ## Install
 
