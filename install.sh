@@ -13,10 +13,14 @@ HOOK_CMD="~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh"
 
 command -v python3 >/dev/null 2>&1 || { echo "install needs python3 (settings.json edit)"; exit 1; }
 
-# 1) symlink the skill
+# 1) symlink the skill (skipped when already installed in place, e.g. via `npx skills add`)
 mkdir -p "$SKILLS_DIR"
-ln -sfn "$SRC" "$SKILLS_DIR/do-it-later"
-echo "linked  $SKILLS_DIR/do-it-later -> $SRC"
+if [ "$SRC" = "$SKILLS_DIR/do-it-later" ]; then
+  echo "in-place at $SRC (no symlink needed)"
+else
+  ln -sfn "$SRC" "$SKILLS_DIR/do-it-later"
+  echo "linked  $SKILLS_DIR/do-it-later -> $SRC"
+fi
 
 # 2) register the SessionStart hook (idempotent, with backup)
 if [ -f "$SETTINGS" ]; then
