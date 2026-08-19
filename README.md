@@ -61,6 +61,10 @@ The TSV stays the single source of truth; the page is a throwaway projection.
 
 ## Install
 
+The whole journey, recorded live (real commands, real session; only waits trimmed):
+
+<p align="center"><img src="docs/demo-journey.gif" width="860" alt="recorded end to end: two install commands, a promise parked with a due date, a fresh session where the model reports the row is overdue and asks fire, re-condition or kill, then done turns the scan green"></p>
+
 Three ways, pick one. Claude Code as the host harness.
 
 **Plugin (recommended — the SessionStart hook registers itself, nothing edits your config):**
