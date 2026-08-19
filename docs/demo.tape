@@ -21,17 +21,17 @@ Type "clear"
 Enter
 Show
 
+Type `# every session starts by asking: what did we promise?`
+Enter
+Type `scan scan`
+Enter
+Sleep 4s
+
 Type `# "later" without a machine-decidable condition? rejected:`
 Enter
 Type `scan add someday-refactor --action "refactor once the architecture matures"`
 Enter
 Sleep 2.8s
-
-Type `# what's due? (the SessionStart hook runs this every session)`
-Enter
-Type `scan scan`
-Enter
-Sleep 4s
 
 Type `# trip it -> work it -> close it`
 Enter

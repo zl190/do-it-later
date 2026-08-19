@@ -1,20 +1,18 @@
 # Do It Later
 
-> **todo_or_die for AI agents.** Say "I'll do it later" — and actually get tripped later.
+> ### Your agent forgets its promises. The machine doesn't.
+>
+> Every *"we'll do it later"* said to Claude Code lands in a ledger — and comes back on
+> its own when it's due.
 
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
-Agents (and the humans driving them) defer things in conversation all the time: *"we'll test
-that once X lands"*, *"revisit after the refactor"*, *"do it later"*. A deferral without a
-real trigger is a **silent kill** — sessions end, context dies, and nothing ever comes back
-for the commitment. Recent prospective-memory benchmarks for LLMs
-([PM-Bench](https://arxiv.org/abs/2607.12385), [TriggerBench](https://arxiv.org/abs/2606.23459))
-report that even frontier models are unreliable at spontaneously remembering to act on
-deferred intentions — relying on the model to recall is a losing bet.
-
-**Do It Later** takes the opposite route: *don't make the model remember — make the machine
-trip.* Commitments go into a plain-TSV ledger with a **machine-decidable condition**, and
+Sessions end, context dies, and every *"revisit after the refactor"* dies with them —
+silently, so you never even know how many promises you lost. Reminding the model to
+remember doesn't work ([the benchmarks are brutal](#related-work)). So this tool doesn't
+ask it to: *don't make the model remember — make the machine trip.* Commitments go into a
+plain-TSV ledger with a **machine-decidable condition** (a due date or a shell check), and
 **mechanical ignition surfaces** push them back into the conversation when the condition
 holds. Ignition rate = event rate, independent of model recall.
 
@@ -143,7 +141,9 @@ is no sandbox and no timeout around them (a slow check delays every session star
 - Continuity/session-state ledgers and agent-memory skills (e.g. Continuity Ledger, Agent
   Memory): **retrospective** — they preserve what happened for later recall. This ledger is
   **prospective** — commitments with tripwires. Complementary, not competing.
-- Prospective-memory research (PM-Bench, TriggerBench; commitment-record vocabulary from the
+- Prospective-memory research ([PM-Bench](https://arxiv.org/abs/2607.12385),
+  [TriggerBench](https://arxiv.org/abs/2606.23459) — even frontier models are unreliable at
+  spontaneously acting on deferred intentions; commitment-record vocabulary from the
   [Always-On agents survey](https://arxiv.org/abs/2606.30306)): benchmarks the model-recall
   route this tool deliberately avoids.
 
