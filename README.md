@@ -45,33 +45,16 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   bad dates. All surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
 
-## Without it / with it
+## The real thing, unscripted
 
-<details><summary>Abridged real transcript (text)</summary>
+<p align="center"><img src="docs/demo-real.gif" width="860" alt="a real claude -p session: the ledger shows an overdue row, the model's actual reply picks it up, scan done turns the ledger green"></p>
 
-```console
-$ scan.sh add someday-refactor --action "refactor once the architecture matures"
-REJECT someday-refactor: no machine-decidable condition — give --due/--check, do it now, or kill it honestly
-
-$ scan.sh scan
-DUE  fix-flaky-timer — revisit the flaky timer test
-     context: tests/timer.spec.ts; repro: run 20x; suspect: fake-clock drift
-     cond: due=2026-08-15 | source: "we'll fix it later" in PR #88 review
--- pm-ledger: 1 due, 0 invalid, 0 malformed (of 3 pending) --
-```
-
-Then a **new session** opens. Nobody mentions the ledger; the opening prompt is just
-*"start today's work"*. The SessionStart hook injects the due rows, and the agent's first
-reply plans them first, closing verb included:
-
-> **Start now:** `fix-flaky-timer`: debug the timer test, run 20×, verify the fake-clock
-> drift fix … then `scan.sh done fix-flaky-timer`.
-
-It didn't remember. It got tripped.
-
-</details>
-
-Re-record the GIF anytime: `vhs docs/demo.tape` (deterministic, throwaway ledger).
+A real ledger file, a real `claude -p` session, the model's actual words; nothing staged
+except trimming the model's thinking wait. It even surfaces this rig's own parked briefs
+mid-reply: real environment, not a set. The loop on camera: `list` shows a `DUE!` row, a
+fresh session gets tripped and proposes disposition (do / re-condition / kill), and
+`done` turns the scan green. Re-record it anytime: `vhs docs/demo-real.tape`; the hero
+storyboard above is `vhs docs/demo.tape`.
 
 ## Install
 
