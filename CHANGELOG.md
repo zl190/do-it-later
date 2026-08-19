@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [0.3.0] - 2026-08-19
+
+### Changed
+- **Registry semantics.** Session start no longer injects the full wall of due rows
+  (worst case measured ~5KB): it emits a one-line count signal, and demands disposition
+  only when a high-stakes row tripped. `signal` verb added.
+- New relevance surface: `topic:<regex>` rows come back with full context the moment the
+  user's prompt or cwd matches — `match` verb + a UserPromptSubmit hook (auto-registered
+  in the plugin; install.sh registers both hooks).
+- Capture gate documented: hot-context ∧ ≤15min ∧ likely-needed → do it now, don't
+  register.
+
 ## [0.2.0] - 2026-08-19
 
 ### Added

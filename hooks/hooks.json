@@ -4,13 +4,39 @@
       {
         "matcher": "startup",
         "hooks": [
-          { "type": "command", "command": "bash", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/session-start-deferrals.sh"] }
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-deferrals.sh"
+            ]
+          }
         ]
       },
       {
         "matcher": "resume",
         "hooks": [
-          { "type": "command", "command": "bash", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/session-start-deferrals.sh"] }
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-deferrals.sh"
+            ]
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-deferrals.sh"
+            ]
+          }
         ]
       }
     ]

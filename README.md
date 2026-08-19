@@ -31,8 +31,8 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
 "let's do it later"                      SessionStart hook (every session)
         │                                        │ due/invalid/malformed?
         ▼                                        ▼
-~/.claude/memory/deferrals.tsv  ──scan──►  [pm-ledger] block in context:
-  id | due | check | action | context      "disposition each: do / re-condition / kill"
+~/.claude/memory/deferrals.tsv  ──signal──►  one line at session start (counts only)
+  id | due | check | action | context ──match──► full context, when your prompt touches it
 ```
 
 - **Condition** = a due date (`2026-09-16`, fires when today ≥ due) **or** a shell check
@@ -40,7 +40,9 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   `add` rejects condition-less rows, and any that sneak in come out as INVALID red.
 - **Context** rides along: each row carries a self-contained line that lets a cold session
   resume the work without the original conversation.
-- **Green is silent**: when nothing is due, the hook injects zero tokens.
+- **Green is silent**: when nothing is due, the hooks inject zero tokens. Red is one
+  line at session start; a row's full context comes back only on demand (`fire`/`list`)
+  or at the moment of relevance (`topic:` rows, when your prompt touches their subject).
 - **Malformed rows are red, never invisible**: wrong column count, empty fields, bad status,
   bad dates. All surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.

@@ -33,7 +33,7 @@ cond    due   = YYYY-MM-DD; fires when today >= due (lexicographic compare, no d
         subjective conditions ("when it matures", "when I have time") are not admissible
 context SELF-CONTAINED: one line that lets a cold session resume the work without the
         original conversation (or a path to a context file)
-surface session-start | cron:<name> | manual   (doctor liveness-checks these)
+surface session-start | topic:<regex> | cron:<name> | manual   (doctor liveness-checks these)
 status  pending | done | killed   (kill requires a reason, recorded in context)
 log     deferrals-usage.log next to the ledger (one line per scan/fire/done/... — read it
         before claiming the tool is used; installs are not usage)
@@ -69,17 +69,32 @@ bash $S doctor              # surface liveness + ledger integrity findings
 4. **Session wrap-up sweep**: every "later / next time / after X" said this session either
    entered the ledger or got done on the spot. This is the last net for the capture side.
 
-## Ignition surfaces
+## Ignition surfaces (v0.3: registry semantics)
 
-| surface | carrier | grade |
+The ledger is a REGISTRY, not a todo list. Full context comes back at the moment of
+relevance or on demand — never as a session-opening wall.
+
+| surface | when it fires | what gets injected |
 |---|---|---|
-| `session-start` | `hooks/session-start-deferrals.sh` (registered by install.sh; green = silent, zero tokens injected) | A: every session walks through it |
-| `cron:<name>` | your scheduler (for slow/periodic conditions) | A if the job actually runs; `doctor` can only mark it unverifiable from bash |
-| `manual` | `fire <id>` | C: pure self-discipline; only park things you can afford to lose |
+| `session-start` | every session start, only if something tripped | ONE line: counts + `pull: list / fire` (~60 tokens; zero when green). Disposition is demanded only when a `high`-stakes row tripped |
+| `topic:<regex>` | the user's prompt (or cwd) matches the regex AND the row is ripe | that row's full context, capped at 3 rows — the promise comes back exactly when you are touching what it is about |
+| `cron:<name>` | your scheduler runs `scan` / `signal` | whatever the job delivers |
+| `manual` | `fire <id>` / `list` / `face` | on demand |
 
-**Disposition protocol**: when a `[pm-ledger]` block appears in session context, every listed
-commitment must be dispositioned: fire→done / re-condition (with a reason) / kill (with a
-reason). Never silently slide past.
+Disposition stays three-way — do (fire→done) / re-condition (a legitimate "not now",
+with a reason) / kill (with a reason). Being tripped never means "must do it now"; it
+means "may not slide past silently".
+
+## Capture gate (do it NOW vs register it)
+
+Before `add`, judge once — deferral is not free (writing the row + carrying it + re-
+fetching context later + the risk it never fires):
+
+- Hot context ∧ ≤15 minutes ∧ likely needed ∧ no missing input → **do it now, don't
+  register.** The cheapest ledger row is the one you never wrote.
+- Otherwise register — with a machine-decidable condition, self-contained context, and
+  the narrowest surface that fits (`topic:` beats `session-start` when the promise is
+  about a specific area).
 
 ## Composition (how other skills and agents plug in)
 

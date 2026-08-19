@@ -105,6 +105,46 @@ printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreate
 printf 'orphan-surf\t2099-01-01\t-\ta\tc\tlow\tno-such-surface\t-\tpending\t2020-01-01\n' >> "$D"
 t "doctor catches unknown surface" 1 'unknown-surface +orphan-surf' env PM_LEDGER="$D" bash "$SCAN" doctor
 
+# ---- v0.3:signal 一行信号 ----
+t "signal 红:一行含计数与标记" 1 '\[pm-ledger\] .*tripped.*pull' bash "$SCAN" signal
+tn "signal 不铺全量 context"    'ctx-past'  bash "$SCAN" signal
+G2="$TMP/green2.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$G2"
+printf 'future-only\t2099-01-01\t-\ta\tc\tlow\tsession-start\t-\tpending\t2020-01-01\n' >> "$G2"
+t "signal 绿:零输出 exit 0"    0 '-' env PM_LEDGER="$G2" bash "$SCAN" signal
+H="$TMP/high.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$H"
+printf 'big-one\t2020-01-01\t-\ta\tc\thigh\tsession-start\t-\tpending\t2020-01-01\n' >> "$H"
+t "signal 点名 high 行"         1 'HIGH: big-one' env PM_LEDGER="$H" bash "$SCAN" signal
+
+# ---- v0.3:match 相关性点火 ----
+M2="$TMP/topic.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$M2"
+printf 'auth-shim\t-\ttrue\tremove the retry shim\tshim in src/auth.ts:88\tmed\ttopic:auth|login\t-\tpending\t2020-01-01\n' >> "$M2"
+printf 'unripe-topic\t2099-01-01\t-\tfuture auth thing\tctx\tlow\ttopic:auth\t-\tpending\t2020-01-01\n' >> "$M2"
+t "match 命中:话题+熟 → 出列"        1 'RELEVANT auth-shim' env PM_LEDGER="$M2" bash "$SCAN" match "fix the login flow"
+t "match 带回全量 context"            1 'src/auth.ts:88'     env PM_LEDGER="$M2" bash "$SCAN" match "fix the login flow"
+tn "match 未熟的话题行不出列"          'unripe-topic' env PM_LEDGER="$M2" bash "$SCAN" match "fix the login flow"
+t "match 不相关文本:静默 exit 0"      0 '-' env PM_LEDGER="$M2" bash "$SCAN" match "write the blog post"
+t "match 空文本:静默 exit 0"          0 '-' env PM_LEDGER="$M2" bash "$SCAN" match ""
+
+# ---- round-4 fixes:signal×topic 隔离 + doctor regex 探针 ----
+TS="$TMP/topicsig.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$TS"
+printf 'ripe-topic\t-\ttrue\ta\tc\thigh\ttopic:auth\t-\tpending\t2020-01-01\n' >> "$TS"
+t "ripe 的 topic 行不染红开场信号(B1)" 0 '-' env PM_LEDGER="$TS" bash "$SCAN" signal
+printf 'real-due\t2020-01-01\t-\tb\tc\tlow\tsession-start\t-\tpending\t2020-01-01\n' >> "$TS"
+t "同账里 session-start 行照常计数"     1 '1 commitment' env PM_LEDGER="$TS" bash "$SCAN" signal
+tn "signal 不点名 topic 行"             'ripe-topic' env PM_LEDGER="$TS" bash "$SCAN" signal
+BR="$TMP/badre.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$BR"
+printf 'bad-re\t2099-01-01\t-\ta\tc\tlow\ttopic:a(b\t-\tpending\t2020-01-01\n' >> "$BR"
+t "doctor 抓坏 topic regex"             1 'broken-topic-regex bad-re' env PM_LEDGER="$BR" bash "$SCAN" doctor
+M4="$TMP/cap4.tsv"
+printf 'id\tdue\tcheck\taction\tcontext\tstakes\tsurface\tsource\tstatus\tcreated\n' > "$M4"
+for i in 1 2 3 4; do printf "cap-$i\t-\ttrue\ta$i\tc\tlow\ttopic:zebra\t-\tpending\t2020-01-01\n" >> "$M4"; done
+t "match 超 3 行折叠 +N more"           1 'more relevant' env PM_LEDGER="$M4" bash "$SCAN" match "the zebra module"
+
 # ---- face:HTML 投影 ----
 FH="$TMP/face.html"
 t "face 出文件"            0 'face.html' bash "$SCAN" face "$FH"

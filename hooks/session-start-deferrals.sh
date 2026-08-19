@@ -12,12 +12,13 @@ SELF="$(cd "$(dirname "$0")" && pwd)"
 SCAN="$SELF/../scripts/scan.sh"
 [ -f "$SCAN" ] || exit 0
 
-out="$(bash "$SCAN" scan 2>/dev/null)"
+# v0.3: the ledger is a registry, not a todo list. Session start emits a ONE-LINE
+# count signal (never the full wall); context is pulled on demand or at relevance
+# (see the user-prompt match hook). Disposition is demanded only for high stakes.
+out="$(bash "$SCAN" signal 2>/dev/null)"
 rc=$?
 
 if [ "$rc" -eq 1 ]; then
-  printf '[pm-ledger] The deferral ledger has due/invalid commitments. Each one MUST be dispositioned this session: do it (fire -> done) / re-condition it (with a reason) / kill it (with a reason). Do not silently slide past — that is the exact failure this ledger exists to prevent.\n'
   printf '%s\n' "$out"
-  printf 'verbs: %s {list | fire <id> | done <id> | kill <id> <reason>}\n' "$SCAN"
 fi
 exit 0

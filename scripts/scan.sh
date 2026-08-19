@@ -213,14 +213,80 @@ cmd_doctor() {
         fi ;;
       cron:*)
         printf 'WARN    unverifiable-surface %s — %s cannot be liveness-checked from bash; verify via your scheduler (does NOT count as green)\n' "$id" "$surface" ;;
+      topic:*)
+        printf '' | grep -Eiq "${surface#topic:}" 2>/dev/null
+        if [ $? -eq 2 ]; then
+          findings=$((findings + 1)); printf 'FINDING broken-topic-regex %s -- "%s" is not a valid ERE -- this relevance surface is silently dead\n' "$id" "${surface#topic:}"
+        fi
+        if ! grep -q 'user-prompt-deferrals.sh' "$HOME/.claude/settings.json" 2>/dev/null; then
+          printf 'WARN    topic-surface %s -- user-prompt hook not in settings.json (plugin installs wire it automatically; manual installs: re-run install.sh)\n' "$id"
+        fi ;;
       manual) : ;;
       *)
-        findings=$((findings + 1)); printf 'FINDING unknown-surface %s — "%s" not in {session-start,cron:<name>,manual}\n' "$id" "$surface" ;;
+        findings=$((findings + 1)); printf 'FINDING unknown-surface %s — "%s" not in {session-start,topic:<regex>,cron:<name>,manual}\n' "$id" "$surface" ;;
     esac
   done < <(read_rows)
   log_usage "cmd=doctor	findings=$findings"
   if [ "$findings" -gt 0 ]; then printf -- '-- doctor: %d finding(s) --\n' "$findings"; return 1; fi
   printf -- '-- doctor: clean --\n'
+}
+
+# signal: the compact SessionStart form (v0.3). The ledger is a REGISTRY, not a todo
+# list -- session start gets a one-line count signal (~60 tokens), never the full wall.
+# Full context is pulled on demand (list/fire) or at the moment of relevance (match).
+# Disposition is only DEMANDED when a high-stakes row tripped.
+cmd_signal() {
+  ensure_ledger
+  local fired=0 invalid=0 malformed=0 hi=''
+  malformed="$(validate_ledger | awk -F= '/^COUNT=/{print $2}')"
+  local id due check action context stakes surface source status created
+  while IFS='	' read -r id due check action context stakes surface source status created; do
+    [ "$status" = "pending" ] || continue
+    if [ "$due" = "-" ] && [ "$check" = "-" ]; then invalid=$((invalid + 1)); continue; fi
+    # topic rows belong to the relevance surface (match); ripeness alone must never
+    # make a session start red — that is B1 of round 4 (stay silent until BOTH hold).
+    case "$surface" in topic:*) continue ;; esac
+    if fired_p "$due" "$check"; then
+      fired=$((fired + 1))
+      if [ "$stakes" = "high" ]; then hi="$hi $id"; fi
+    fi
+  done < <(read_rows)
+  log_usage "cmd=signal	fired=$fired	invalid=$invalid	malformed=$malformed"
+  if [ $((fired + invalid + malformed)) -eq 0 ]; then return 0; fi
+  printf '[pm-ledger] %d commitment(s) tripped' "$fired"
+  if [ $((invalid + malformed)) -gt 0 ]; then printf ', %d invalid/malformed (run doctor)' "$((invalid + malformed))"; fi
+  if [ -n "$hi" ]; then printf ' | HIGH:%s -- needs disposition this session' "$hi"; fi
+  printf -- ' -- pull: %s list | fire <id>\n' "$0"
+  return 1
+}
+
+# match: relevance-triggered ignition (v0.3). Rows with surface `topic:<regex>` stay
+# silent until BOTH hold: the row is ripe (due/check) AND the current work (prompt+cwd
+# text passed in) matches the regex. Then, and only then, the full context comes back.
+cmd_match() {
+  ensure_ledger
+  local text="$*"
+  if [ -z "$text" ]; then return 0; fi
+  local shown=0 extra=0
+  local id due check action context stakes surface source status created pat
+  while IFS='	' read -r id due check action context stakes surface source status created; do
+    [ "$status" = "pending" ] || continue
+    case "$surface" in topic:*) pat="${surface#topic:}" ;; *) continue ;; esac
+    printf '%s' "$text" | grep -Eiq "$pat" 2>/dev/null || continue
+    fired_p "$due" "$check" || continue
+    if [ "$shown" -ge 3 ]; then extra=$((extra + 1)); continue; fi
+    shown=$((shown + 1))
+    printf 'RELEVANT %s -- %s
+         context: %s
+         cond: due=%s check=%s | stakes=%s | source=%s
+' \
+      "$id" "$action" "$context" "$due" "$check" "$stakes" "$source"
+  done < <(read_rows)
+  log_usage "cmd=match	shown=$shown	extra=$extra"
+  if [ "$shown" -eq 0 ]; then return 0; fi
+  if [ "$extra" -gt 0 ]; then printf '(+%d more relevant -- scan.sh list)
+' "$extra"; fi
+  return 1
 }
 
 # face: render the ledger as a self-contained HTML page (a human face for the queue).
@@ -287,6 +353,8 @@ cmd_face() {
 
 case "${1:-scan}" in
   scan) cmd_scan ;;
+  signal) cmd_signal ;;
+  match) shift; cmd_match "$@" ;;
   list) cmd_list ;;
   face) shift; cmd_face "${1:-}" ;;
   fire) shift; cmd_fire "${1:?usage: fire <id>}" ;;
@@ -294,5 +362,5 @@ case "${1:-scan}" in
   kill) shift; cmd_kill "$@" ;;
   add) shift; cmd_add "$@" ;;
   doctor) cmd_doctor ;;
-  *) printf 'usage: scan.sh {scan|list|face [out.html]|fire <id>|done <id>|kill <id> <reason>|add <id> ...|doctor}\n' >&2; exit 2 ;;
+  *) printf 'usage: scan.sh {scan|signal|match <text>|list|face [out.html]|fire <id>|done <id>|kill <id> <reason>|add <id> ...|doctor}\n' >&2; exit 2 ;;
 esac

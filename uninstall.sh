@@ -9,17 +9,21 @@ HOOK_CMD="~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh"
 
 if [ -f "$SETTINGS" ] && command -v python3 >/dev/null 2>&1; then
   cp "$SETTINGS" "$SETTINGS.bak.$(date +%Y%m%d%H%M%S)"
-  SETTINGS="$SETTINGS" HOOK_CMD="$HOOK_CMD" python3 - <<'EOF'
+  SETTINGS="$SETTINGS" python3 - <<'EOF'
 import json, os
 path = os.environ['SETTINGS']
-cmd = os.environ['HOOK_CMD']
+cmds = {
+    '~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh',
+    '~/.claude/skills/do-it-later/hooks/user-prompt-deferrals.sh',
+}
 with open(path) as f:
     s = json.load(f)
 changed = False
-for g in s.get('hooks', {}).get('SessionStart', []):
-    before = len(g.get('hooks', []))
-    g['hooks'] = [h for h in g.get('hooks', []) if h.get('command') != cmd]
-    changed = changed or len(g['hooks']) != before
+for event in ('SessionStart', 'UserPromptSubmit'):
+    for g in s.get('hooks', {}).get(event, []):
+        before = len(g.get('hooks', []))
+        g['hooks'] = [h for h in g.get('hooks', []) if h.get('command') not in cmds]
+        changed = changed or len(g['hooks']) != before
 if changed:
     with open(path, 'w') as f:
         json.dump(s, f, indent=2, ensure_ascii=False)

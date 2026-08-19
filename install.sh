@@ -30,25 +30,31 @@ else
   printf '{}\n' > "$SETTINGS"
 fi
 
-SETTINGS="$SETTINGS" HOOK_CMD="$HOOK_CMD" python3 - <<'EOF'
+SETTINGS="$SETTINGS" python3 - <<'EOF'
 import json, os
 path = os.environ['SETTINGS']
-cmd = os.environ['HOOK_CMD']
+pairs = [
+    ('SessionStart', '~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh'),
+    ('UserPromptSubmit', '~/.claude/skills/do-it-later/hooks/user-prompt-deferrals.sh'),
+]
 with open(path) as f:
     s = json.load(f)
 hooks = s.setdefault('hooks', {})
-groups = hooks.setdefault('SessionStart', [])
-if not groups:
-    groups.append({'matcher': '', 'hooks': []})
-entries = groups[0].setdefault('hooks', [])
-if any(h.get('command') == cmd for g in groups for h in g.get('hooks', [])):
-    print('hook    already registered')
-else:
-    entries.append({'type': 'command', 'command': cmd})
+changed = False
+for event, cmd in pairs:
+    groups = hooks.setdefault(event, [])
+    if not groups:
+        groups.append({'matcher': '', 'hooks': []})
+    if any(h.get('command') == cmd for g in groups for h in g.get('hooks', [])):
+        print('hook    already registered (%s)' % event)
+    else:
+        groups[0].setdefault('hooks', []).append({'type': 'command', 'command': cmd})
+        changed = True
+        print('hook    registered (%s)' % event)
+if changed:
     with open(path, 'w') as f:
         json.dump(s, f, indent=2, ensure_ascii=False)
         f.write('\n')
-    print('hook    registered in settings.json (SessionStart)')
 EOF
 rc=$?
 [ $rc -eq 0 ] || { echo "settings.json edit failed — settings.json was not modified (the step-1 symlink remains; remove with uninstall.sh if unwanted)"; exit $rc; }
