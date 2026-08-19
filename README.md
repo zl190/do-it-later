@@ -2,17 +2,18 @@
 
 > ### Your agent forgets its promises. The machine doesn't.
 >
-> Every *"we'll do it later"* said to Claude Code lands in a ledger — and comes back on
-> its own when it's due.
+> Every *"I'll do that later"* your agent says lands in a ledger — and comes back on its
+> own when it's due.
 
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
-Humans have had *read-it-later* for fifteen years. Agents never got a *do-it-later* —
-when you tell Claude Code *"revisit after the refactor"*, there is no list at all: the
-session ends and the promise evaporates so silently you never know it existed. Reminding
-the model to remember doesn't work ([the benchmarks are brutal](#related-work)). So first,
-this gives agents the queue they never had.
+Your own "later" has containers — issues, notes, *read-it-later*. But when the **agent**
+says *"I'll revisit this once the refactor lands"*, that promise lives nowhere: not an
+issue, not a file, just tokens in a context window that's about to die. The session ends
+and the promise was never real — you don't even register it as one. Asking the model to
+remember doesn't work ([the benchmarks are brutal](#related-work)). So first, this gives
+the agent's promises the queue they never had.
 
 But everyone also knows why read-it-later lists die anyway: **they have no trigger** — the
 list just waits for you to remember it exists. So this queue ships with the half that was

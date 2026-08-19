@@ -1,62 +1,18 @@
-# demo.tape — before/after contrast: the delta IS the product.
-# Scene 1 (without): a promise dies in silence. Scene 2 (with): same promise comes back.
-# Re-record: vhs docs/demo.tape   (throwaway ledger; engine output is real)
+# demo.tape — the story as it actually happens: a Claude Code conversation.
+# Scene 1 (without): the promise dies in silence. Scenes 2-3 (with): you say the same
+# sentence; the skill parks it; a NEW session gets tripped and the agent picks it up.
+# Playback lives in docs/demo-play.sh (staged replay of the verified live-fire pattern).
+# Re-record: vhs docs/demo.tape
 Output docs/demo.gif
 Set FontSize 21
 Set Width 1000
 Set Height 480
 Set Padding 22
-Set TypingSpeed 25ms
 Set Theme "Catppuccin Mocha"
 
 Hide
-Type `scan() { bash ~/.claude/skills/do-it-later/scripts/scan.sh "$@"; }`
+Type `bash docs/demo-play.sh; sleep 60`
 Enter
-Type `export PM_LEDGER=$(mktemp -d)/deferrals.tsv`
-Enter
-Type "clear"
-Enter
+Sleep 400ms
 Show
-
-Type@55ms `# WITHOUT do-it-later`
-Enter
-Sleep 800ms
-Type@55ms `#   you: "the dark-mode toggle? let's do it later."`
-Enter
-Sleep 1.5s
-Type@120ms `#   ...weeks pass...`
-Enter
-Sleep 1.5s
-Type@120ms `#   (nothing comes back. you never even notice.)`
-Enter
-Sleep 2.8s
-
-Hide
-Type "clear"
-Enter
-Show
-Type@55ms `# WITH do-it-later`
-Enter
-Sleep 800ms
-Type@55ms `#   you: "the dark-mode toggle? let's do it later."`
-Enter
-Sleep 1.2s
-Type `scan add dark-mode --due 2026-09-01 --action "add the dark-mode toggle (issue #12)"`
-Enter
-Sleep 2.2s
-
-Hide
-Type `sed -i.bak 's/2026-09-01/2026-08-01/' "$PM_LEDGER"`
-Enter
-Type "clear"
-Enter
-Show
-Type@55ms `#   ...weeks pass... a NEW session opens:`
-Enter
-Sleep 1.5s
-Type `scan scan`
-Enter
-Sleep 4s
-Type@120ms `#   it came back by itself.`
-Enter
-Sleep 3s
+Sleep 26s
