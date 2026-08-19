@@ -15,4 +15,4 @@ Type `bash docs/demo-play.sh; sleep 60`
 Enter
 Sleep 400ms
 Show
-Sleep 27s
+Sleep 31s
