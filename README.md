@@ -1,25 +1,25 @@
-# Do It Later — a "read-it-later" for agents, with context and a trigger
+# Do It Later: a "read-it-later" for agents, with context and a trigger
 
 > ### Your agent forgets its promises. The machine doesn't.
 >
-> Let every *"I'll do that later"* your agent says land in a ledger — and come back on
-> its own when it's due.
+> Let every *"I'll do that later"* your agent says land in a ledger and come back on its
+> own when due.
 
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
 **Agent promises are cheap.** *"I'll revisit this once the refactor lands"* is not an
-issue, not a file — just tokens in a context window that's about to die. The session ends;
+issue, not a file. Just tokens in a context window that's about to die. The session ends;
 the promise was never real. Asking the model to remember doesn't work
 ([the benchmarks are brutal](#related-work)). So first, this gives the agent's promises
 the queue they never had.
 
-Humans at least park their "later" somewhere — and everyone knows how *read-it-later*
+Humans at least park their "later" somewhere. And everyone knows how *read-it-later*
 lists still die: **no trigger**. The list just waits for you to remember it exists. So
 this queue ships with the missing half: every commitment carries a **machine-decidable
 condition** (a due date or a shell check), and **mechanical ignition surfaces** fire it
-back into the conversation when the condition holds. *Don't make the model remember —
-make the machine trip.* Ignition rate = event rate, independent of model recall.
+back into the conversation when the condition holds. *Don't make the model remember.
+Make the machine trip.* Ignition rate = event rate, independent of model recall.
 
 The name is the crime: the phrase this tool polices is the phrase that invokes it.
 
@@ -34,13 +34,13 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
 ```
 
 - **Condition** = a due date (`2026-09-16`, fires when today ≥ due) **or** a shell check
-  (`grep -q needle config`, fires when it exits 0). *"When it matures" is not a condition* —
+  (`grep -q needle config`, fires when it exits 0). *"When it matures" is not a condition*:
   `add` rejects condition-less rows, and any that sneak in come out as INVALID red.
 - **Context** rides along: each row carries a self-contained line that lets a cold session
   resume the work without the original conversation.
 - **Green is silent**: when nothing is due, the hook injects zero tokens.
 - **Malformed rows are red, never invisible**: wrong column count, empty fields, bad status,
-  bad dates — all surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
+  bad dates. All surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
 
 ## Without it / with it
@@ -60,11 +60,11 @@ DUE  fix-flaky-timer — revisit the flaky timer test
 -- pm-ledger: 1 due, 0 invalid, 0 malformed (of 3 pending) --
 ```
 
-Then a **new session** opens. Nobody mentions the ledger — the opening prompt is just
+Then a **new session** opens. Nobody mentions the ledger; the opening prompt is just
 *"start today's work"*. The SessionStart hook injects the due rows, and the agent's first
 reply plans them first, closing verb included:
 
-> **Start now:** `fix-flaky-timer` — debug the timer test, run 20×, verify the fake-clock
+> **Start now:** `fix-flaky-timer`: debug the timer test, run 20×, verify the fake-clock
 > drift fix … then `scan.sh done fix-flaky-timer`.
 
 It didn't remember. It got tripped.
@@ -94,7 +94,7 @@ bash ~/do-it-later/tests/run.sh
 ```
 
 32 mutation self-checks: due must red / not-due must green, both directions, plus ledger
-integrity, TSV-injection guards, and lifecycle round-trips. Runs against a temp ledger —
+integrity, TSV-injection guards, and lifecycle round-trips. Runs against a temp ledger;
 your real one is untouched.
 
 ## Use
@@ -131,9 +131,9 @@ condition is a date or an exit code) ∧ **live** (the ignition surface actually
 - Subjective condition → rejected at `add`; smuggled-in rows show as INVALID. That is
   exposure, not a solution.
 - Dead surface → `doctor` catches known shapes (unregistered hook, unknown surface name);
-  a scheduler job cannot be liveness-checked from bash — verify it in the scheduler itself.
+  a scheduler job cannot be liveness-checked from bash; verify it in the scheduler itself.
 
-Also: `check` commands are run by `scan` — keep them instant, read-only, idempotent. There
+Also: `check` commands are run by `scan`: keep them instant, read-only, idempotent. There
 is no sandbox and no timeout around them (a slow check delays every session start).
 
 ## Related work
@@ -141,13 +141,13 @@ is no sandbox and no timeout around them (a slow check delays every session star
 - [todo_or_die](https://github.com/searls/todo_or_die) (Ruby) / [expiring-todo-comments](https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/expiring-todo-comments.md)
   (eslint): the same semantics for code comments, tripped in build/lint runtimes. This tool
   moves both ends: capture from **conversation**, ignite on **agent-session events**. One
-  cautionary tale ported as a design rule: the eslint rule ships `checkDates: false` — its
+  cautionary tale ported as a design rule: the eslint rule ships `checkDates: false`, so its
   flagship semantic is dead by default. Here, date firing is always on, no environment guards.
 - Continuity/session-state ledgers and agent-memory skills (e.g. Continuity Ledger, Agent
-  Memory): **retrospective** — they preserve what happened for later recall. This ledger is
-  **prospective** — commitments with tripwires. Complementary, not competing.
+  Memory): **retrospective**: they preserve what happened for later recall. This ledger is
+  **prospective**: commitments with tripwires. Complementary, not competing.
 - Prospective-memory research ([PM-Bench](https://arxiv.org/abs/2607.12385),
-  [TriggerBench](https://arxiv.org/abs/2606.23459) — even frontier models are unreliable at
+  [TriggerBench](https://arxiv.org/abs/2606.23459): even frontier models are unreliable at
   spontaneously acting on deferred intentions; commitment-record vocabulary from the
   [Always-On agents survey](https://arxiv.org/abs/2606.30306)): benchmarks the model-recall
   route this tool deliberately avoids.
