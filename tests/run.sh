@@ -108,11 +108,11 @@ t "doctor catches unknown surface" 1 'unknown-surface +orphan-surf' env PM_LEDGE
 # ---- face:HTML 投影 ----
 FH="$TMP/face.html"
 t "face 出文件"            0 'face.html' bash "$SCAN" face "$FH"
-t "face 含 DUE 行"         0 "chip.>DUE" grep -o "chip'>DUE" "$FH"
+t "face 含 DUE 行"         0 "row due" grep -o "row due" "$FH"
 printf 'xss-row\t2020-01-01\t-\t<script>alert(1)</script>\tctx\tlow\tmanual\t-\tpending\t2020-01-01\n' >> "$PM_LEDGER"
 bash "$SCAN" face "$FH" >/dev/null
 t "face 转义 HTML"         0 '&lt;script&gt;' grep -o '&lt;script&gt;' "$FH"
-tn "face 不含裸 script 标签" '<script>' cat "$FH"
+tn "face 不含未转义的注入载荷" '<script>alert' cat "$FH"
 
 # ---- usage 计数在写 ----
 t "usage log records scan" 0 'cmd=scan' grep 'cmd=scan' "$TMP/deferrals-usage.log"

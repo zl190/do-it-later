@@ -224,8 +224,9 @@ cmd_doctor() {
 }
 
 # face: render the ledger as a self-contained HTML page (a human face for the queue).
+# Layout: condition column | action+context+id | a fire button (click = copy command).
 # The TSV stays the single source of truth; this is a derived projection, regenerate at
-# will. Zero dependencies, dark, one file.
+# will. Zero dependencies, light theme with dark auto-variant, one file.
 esc() { printf '%s' "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'; }
 
 cmd_face() {
@@ -234,18 +235,21 @@ cmd_face() {
   local id due check action context stakes surface source status created
   local rows_due='' rows_pending='' rows_closed='' n_due=0 n_pending=0 n_closed=0
   while IFS='	' read -r id due check action context stakes surface source status created; do
-    local cond chip cls
-    if [ "$due" != "-" ]; then cond="due $due"; else cond="when: $(esc "$check")"; fi
+    local when cls badge=''
+    if [ "$due" != "-" ]; then when="due $due"
+    elif [ "$check" != "-" ]; then when="check: $(esc "${check:0:26}")"
+    else when="no condition"
+    fi
     case "$status" in
       pending)
-        if [ "$due" = "-" ] && [ "$check" = "-" ]; then chip=INVALID; cls=invalid
-        elif fired_p "$due" "$check"; then chip=DUE; cls=due
-        else chip=pending; cls=pending
+        if [ "$due" = "-" ] && [ "$check" = "-" ]; then cls=invalid; badge="<span class='badge inv'>INVALID</span>"
+        elif fired_p "$due" "$check"; then cls=due; badge="<span class='badge'>DUE</span>"
+        else cls=pending
         fi ;;
-      *) chip="$status"; cls=closed ;;
+      *) cls=closed; badge="<span class='badge off'>$status</span>" ;;
     esac
     local row
-    row="<div class='row $cls'><span class='chip'>$chip</span><div class='body'><div class='top'><code>$(esc "$id")</code><span class='cond'>$cond · $stakes</span></div><div class='act'>$(esc "$action")</div><div class='ctx'>$(esc "$context") <span class='src'>[$(esc "$source")]</span></div></div><code class='fire'>fire $(esc "$id")</code></div>"
+    row="<div class='row $cls'><div class='cond'><span class='when'>$when</span>$badge<span class='chip $stakes'>$stakes</span></div><div class='body'><div class='act'>$(esc "$action")</div><div class='ctx'>$(esc "$context") <span class='src'>[$(esc "$source")]</span></div><code class='id'>$(esc "$id")</code></div><button class='fire' onclick=\"copyFire('$(esc "$id")',this)\">&#9889; fire</button></div>"
     case "$cls" in
       due|invalid) rows_due="$rows_due$row"; n_due=$((n_due + 1)) ;;
       pending)     rows_pending="$rows_pending$row"; n_pending=$((n_pending + 1)) ;;
@@ -253,20 +257,29 @@ cmd_face() {
     esac
   done < <(read_rows)
   {
-    printf '<!doctype html><meta charset="utf-8"><title>pm-ledger</title><style>'
-    printf 'body{background:#1e1e2e;color:#cdd6f4;font:15px/1.45 -apple-system,system-ui,sans-serif;max-width:880px;margin:32px auto;padding:0 20px}'
-    printf 'h1{font-size:19px}h1 small{color:#7f849c;font-weight:400;margin-left:10px}'
-    printf '.row{display:flex;gap:12px;align-items:flex-start;background:#181825;border:1px solid #313244;border-radius:9px;padding:12px 14px;margin:9px 0}'
-    printf '.chip{flex:0 0 64px;text-align:center;font-size:11px;font-weight:700;border-radius:99px;padding:3px 0;background:#313244;color:#a6adc8}'
-    printf '.due .chip{background:#f38ba8;color:#1e1e2e}.invalid .chip{background:#f9e2af;color:#1e1e2e}.closed{opacity:.45}'
-    printf '.body{flex:1;min-width:0}.top{display:flex;justify-content:space-between;gap:8px}'
-    printf '.top code{color:#89b4fa}.cond{color:#7f849c;font-size:12.5px}'
-    printf '.act{margin-top:2px}.ctx{color:#7f849c;font-size:12.5px;margin-top:2px}.src{color:#585b70}'
-    printf ".fire{flex:0 0 auto;align-self:center;font-size:11.5px;color:#a6e3a1;border:1px solid #313244;border-radius:6px;padding:3px 8px}"
-    printf 'footer{color:#585b70;font-size:12px;margin-top:18px}</style>'
-    printf '<h1>pm-ledger <small>%s due/invalid · %s pending · %s closed · %s</small></h1>' "$n_due" "$n_pending" "$n_closed" "$TODAY"
+    printf '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>pm-ledger</title><style>'
+    printf ':root{--bg:#f7f5f1;--card:#fff;--bd:#e6e2d9;--tx:#2f2c26;--dim:#8b867b;--mono:#6f6a60;--red:#b03e36;--amb:#9a7b00;--grn:#3d7a45}'
+    printf '@media (prefers-color-scheme:dark){:root{--bg:#1e1e2e;--card:#181825;--bd:#313244;--tx:#cdd6f4;--dim:#7f849c;--mono:#a6adc8;--red:#f38ba8;--amb:#f9e2af;--grn:#a6e3a1}}'
+    printf 'body{background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,system-ui,sans-serif;max-width:920px;margin:34px auto;padding:0 20px}'
+    printf 'h1{font-size:22px;margin:0 0 16px}h1 small{color:var(--dim);font-weight:400;font-size:15px;margin-left:12px}'
+    printf '.row{display:flex;gap:18px;align-items:flex-start;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin:12px 0}'
+    printf '.cond{flex:0 0 138px;display:flex;flex-direction:column;gap:7px;align-items:flex-start}'
+    printf '.when{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14.5px;font-weight:600}'
+    printf '.due .when{color:var(--red)}.invalid .when{color:var(--amb)}'
+    printf '.badge{font-size:10.5px;font-weight:800;color:#fff;background:var(--red);border-radius:5px;padding:1px 7px;letter-spacing:.5px}'
+    printf '.badge.inv{background:var(--amb)}.badge.off{background:var(--dim)}'
+    printf '.chip{font-size:12px;border:1.5px solid var(--bd);color:var(--dim);border-radius:99px;padding:1px 11px}'
+    printf '.chip.high{color:var(--red);border-color:var(--red)}'
+    printf '.body{flex:1;min-width:0}.act{font-size:16.5px;font-weight:600;line-height:1.4}'
+    printf '.ctx{color:var(--dim);font-size:13.5px;margin-top:4px}.src{opacity:.75}'
+    printf '.id{display:block;font-size:12px;color:var(--mono);margin-top:5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}'
+    printf '.fire{flex:0 0 auto;align-self:center;font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--tx);background:var(--card);border:1.5px solid var(--bd);border-radius:11px;padding:9px 16px;cursor:pointer}'
+    printf '.fire:hover{border-color:var(--dim)}'
+    printf '.closed{opacity:.45}footer{color:var(--dim);font-size:12.5px;margin-top:20px}</style>'
+    printf '<h1>pm-ledger <small>%s due/invalid &#183; %s pending &#183; %s closed &#183; %s</small></h1>' "$n_due" "$n_pending" "$n_closed" "$TODAY"
     printf '%s%s%s' "$rows_due" "$rows_pending" "$rows_closed"
-    printf '<footer>projection of %s — the TSV is the truth; regenerate with <code>scan.sh face</code>. verbs: fire · done · kill · add · doctor</footer>' "$(esc "$LEDGER")"
+    printf '<footer>projection of %s &#8212; the TSV is the truth; regenerate with <code>scan.sh face</code>. &#9889; = click to copy the fire command.</footer>' "$(esc "$LEDGER")"
+    printf '<script>function copyFire(id,el){var c="bash ~/.claude/skills/do-it-later/scripts/scan.sh fire "+id;if(navigator.clipboard){navigator.clipboard.writeText(c)}el.textContent="copied";setTimeout(function(){el.innerHTML="&#9889; fire"},900)}</script>'
   } > "$out"
   log_usage "cmd=face	due=$n_due	pending=$n_pending"
   printf '%s\n' "$out"
