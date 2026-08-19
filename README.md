@@ -70,7 +70,7 @@ bash $S add fix-flaky-timer --due 2026-09-01 \
   --action "revisit the flaky timer test after the scheduler rewrite lands" \
   --context "test: tests/timer.spec.ts; flake repro: run 20x; suspect: fake-clock drift"
 
-bash $S add bump-node --check '[ $(node -v | cut -c2-3) -ge 24 ]' \
+bash $S add bump-node --check '[ "$(node -e "console.log(process.versions.node.split(\".\")[0])")" -ge 24 ]' \
   --action "drop the polyfill once node >= 24 is the floor" \
   --context "polyfill lives in src/compat.ts; delete + run full suite"
 

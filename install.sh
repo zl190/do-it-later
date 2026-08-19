@@ -7,6 +7,8 @@ SRC="$(cd "$(dirname "$0")" && pwd)"
 CLAUDE_DIR="${CLAUDE_DIR:-$HOME/.claude}"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 SETTINGS="$CLAUDE_DIR/settings.json"
+# HOOK_CMD stays literal ~/.claude on purpose: it is what goes INTO settings.json.
+# CLAUDE_DIR only redirects where THIS script writes (a test hook, mainly).
 HOOK_CMD="~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh"
 
 command -v python3 >/dev/null 2>&1 || { echo "install needs python3 (settings.json edit)"; exit 1; }
@@ -45,7 +47,7 @@ else:
     print('hook    registered in settings.json (SessionStart)')
 EOF
 rc=$?
-[ $rc -eq 0 ] || { echo "settings.json edit failed — nothing else was changed"; exit $rc; }
+[ $rc -eq 0 ] || { echo "settings.json edit failed — settings.json was not modified (the step-1 symlink remains; remove with uninstall.sh if unwanted)"; exit $rc; }
 
 echo
 echo "done. verify with:  bash $SRC/tests/run.sh"
