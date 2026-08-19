@@ -1,4 +1,4 @@
-# Do It Later — an agent "read-it-later", with context and a trigger
+# Do It Later — a "read-it-later" for agents, with context and a trigger
 
 > ### Your agent forgets its promises. The machine doesn't.
 >
