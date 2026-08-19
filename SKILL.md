@@ -81,6 +81,29 @@ bash $S doctor              # surface liveness + ledger integrity findings
 commitment must be dispositioned: fire→done / re-condition (with a reason) / kill (with a
 reason). Never silently slide past.
 
+## Composition (how other skills and agents plug in)
+
+Two invocation layers, in the mattpocock/skills sense:
+
+- **Model-invoked** (the discipline): capturing deferral language the moment it appears,
+  and sweeping the conversation at wrap-up. Any session-closing or handoff skill can run
+  the sweep; the whole inbound API is one line:
+  `bash ~/.claude/skills/do-it-later/scripts/scan.sh add <id> --due|--check ... --action ... --context ...`
+- **User-invoked** (the verbs): `scan / list / face / fire / done / kill / doctor`, run
+  directly or via a chat request.
+
+Two seams for chaining:
+
+- **Inbound seam**: wrap-up, handoff, and review skills should end with a deferral sweep;
+  anything deferred lands as a row instead of dying in the transcript.
+- **Outbound seam**: a tripped or fired row is a ready cold-start work order; its
+  `action` + `context` are written to stand alone, so pipe them straight into your
+  implement/TDD flow. Disposition verbs (`done` / `kill <reason>`) close the loop.
+
+The `PM_LEDGER` environment variable is the composition point for WHERE the queue lives:
+unset = the rig-global ledger; set = any file you like, including a repo-local one (see
+the per-repo mode in the README).
+
 ## Honest boundary (when this does NOT work)
 
 It works only when three things all hold: the commitment entered the ledger ∧ the condition

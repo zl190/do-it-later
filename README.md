@@ -107,6 +107,27 @@ In-session, the skill (SKILL.md) teaches the agent the other half: capture defer
 into the ledger as it happens, sweep the conversation at wrap-up, and disposition every
 tripped commitment instead of sliding past.
 
+## Per-repo ledgers (todo_or_die mode)
+
+Everything above uses one rig-global ledger. `PM_LEDGER` turns the same engine into a
+repo-local one, which lands you back at the original todo_or_die semantics: a deferral
+file in git, and CI that goes red the day a promise comes due.
+
+```bash
+PM_LEDGER=./deferrals.tsv bash scripts/scan.sh add drop-node18 \
+  --due 2026-10-01 --action "drop node 18 support" --context "engines field + CI matrix"
+```
+
+```yaml
+# .github/workflows/deferrals.yml
+- run: git clone --depth 1 https://github.com/zl190/do-it-later /tmp/dil
+- run: PM_LEDGER=deferrals.tsv bash /tmp/dil/scripts/scan.sh scan   # exits 1 when due
+```
+
+Date conditions always make sense in CI; `check` conditions run in the runner's context,
+so keep them repo-relative. The SessionStart hook only watches the rig-global ledger; a
+repo ledger's ignition surface is its CI.
+
 ## When this does NOT work (honest boundary)
 
 Three conditions must all hold: **captured** (it's in the ledger) ∧ **decidable** (the
