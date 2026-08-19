@@ -8,6 +8,8 @@
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
 
+<p align="center"><img src="docs/demo.gif" width="820" alt="without: a deferred promise silently dies; with: the same promise comes back on its own in a new session"></p>
+
 **Agent promises are cheap.** *"I'll revisit this once the refactor lands"* is not an
 issue, not a file. Just tokens in a context window that's about to die. The session ends;
 the promise was never real. Asking the model to remember doesn't work
@@ -44,8 +46,6 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
   quietly disappears is the exact failure this tool exists to prevent.
 
 ## Without it / with it
-
-<p align="center"><img src="docs/demo.gif" width="820" alt="without: a deferred promise silently dies; with: the same promise comes back on its own in a new session"></p>
 
 <details><summary>Abridged real transcript (text)</summary>
 

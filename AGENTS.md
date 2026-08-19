@@ -27,12 +27,12 @@ bash scripts/scan.sh scan  # the engine (uses PM_LEDGER env override)
   no `sed -i` without suffix, no date arithmetic (date comparisons are ISO-lexicographic
   on purpose). CI runs the suite on ubuntu + macOS system bash.
 - **Ledger integrity is load-bearing**: rows must never become silently invisible.
-  `read_rows` (well-formed only) and `validate_ledger` (reds everything else) are a pair —
+  `read_rows` (well-formed only) and `validate_ledger` (reds everything else) are a pair:
   if you change one, change the other, and add a MALFORMED test.
 - **Date firing stays always-on.** No environment guards, no opt-in flag. (Lineage lesson:
-  eslint's expiring-todo-comments ships `checkDates: false` — a flagship semantic that is
+  eslint's expiring-todo-comments ships `checkDates: false`, a flagship semantic that is
   dead by default. We do the opposite on purpose.)
-- `install.sh`/`uninstall.sh` edit `~/.claude/settings.json` — test changes only against a
+- `install.sh`/`uninstall.sh` edit `~/.claude/settings.json`; test changes only against a
   sandbox (`CLAUDE_DIR=$(mktemp -d)`), keep them idempotent, keep the backup step.
 
 ## Scope (say no for the maintainer)

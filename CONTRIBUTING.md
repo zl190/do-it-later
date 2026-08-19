@@ -1,6 +1,6 @@
 # Contributing
 
-Small tool, sharp scope — read [AGENTS.md](AGENTS.md) first: it carries the invariants
+Small tool, sharp scope. Read [AGENTS.md](AGENTS.md) first: it carries the invariants
 (mutation-test discipline, bash 3.2 + POSIX awk floor, ledger-integrity pairing, always-on
 date firing) that apply to humans exactly as much as to agents.
 
