@@ -1,0 +1,4 @@
+2026-08-19T18:12:51	cmd=list
+2026-08-19T18:13:02	cmd=scan	fired=1	invalid=0	malformed=0	pending=2
+2026-08-19T18:14:40	cmd=done	id=dark-mode
+2026-08-19T18:14:40	cmd=scan	fired=0	invalid=0	malformed=0	pending=1

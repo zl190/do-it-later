@@ -1,0 +1,3 @@
+id	due	check	action	context	stakes	surface	source	status	created
+dark-mode	2026-08-01	-	wire the dark-mode toggle	see issue #12; tokens in shared/COLORS.md	low	session-start	PR #12 review	done	2026-07-20
+q4-writeup	2026-12-01	-	write the Q4 wrap-up	material in blog/drafts/	low	session-start	-	pending	2026-07-20
