@@ -1,0 +1,45 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: mutation self-checks (default bash)
+        run: bash tests/run.sh
+
+      # macOS system bash 3.2 is the oldest shell we claim to support —
+      # run the suite under it explicitly (PATH bash on the runner is newer).
+      - name: mutation self-checks (bash 3.2)
+        if: runner.os == 'macOS'
+        run: /bin/bash tests/run.sh
+
+      - name: install/uninstall round-trip (sandboxed CLAUDE_DIR)
+        run: |
+          T="$(mktemp -d)"
+          CLAUDE_DIR="$T" ./install.sh
+          CLAUDE_DIR="$T" ./install.sh   # idempotent
+          python3 - "$T/settings.json" <<'EOF'
+          import json, sys
+          s = json.load(open(sys.argv[1]))
+          hooks = [h['command'] for g in s['hooks']['SessionStart'] for h in g['hooks']]
+          assert hooks.count('~/.claude/skills/do-it-later/hooks/session-start-deferrals.sh') == 1, hooks
+          print('install: registered exactly once')
+          EOF
+          CLAUDE_DIR="$T" ./uninstall.sh
+          python3 - "$T/settings.json" <<'EOF'
+          import json, sys
+          s = json.load(open(sys.argv[1]))
+          hooks = [h['command'] for g in s['hooks']['SessionStart'] for h in g['hooks']]
+          assert not hooks, hooks
+          print('uninstall: clean')
+          EOF

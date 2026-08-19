@@ -1,0 +1,27 @@
+name: Bug report
+description: Something fired that shouldn't, didn't fire that should, or broke the ledger
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened vs what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: scan
+    attributes:
+      label: scan + doctor output against a FIXTURE ledger
+      description: >
+        Reproduce with PM_LEDGER=$(mktemp -d)/deferrals.tsv (never paste your real ledger).
+        Paste the fixture rows and the full output of `scan.sh scan` and `scan.sh doctor`.
+      render: console
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS + bash version
+      placeholder: "macOS 15 / bash 3.2.57; or ubuntu 24.04 / bash 5.2"
+    validations:
+      required: true

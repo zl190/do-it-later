@@ -1,0 +1,10 @@
+name: Feature request
+description: Propose an addition (read the scope section in CONTRIBUTING.md first)
+labels: [enhancement]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal + why it belongs in a deferral ledger (and not a todo app)
+    validations:
+      required: true

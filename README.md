@@ -2,6 +2,9 @@
 
 > **todo_or_die for AI agents.** Say "I'll do it later" — and actually get tripped later.
 
+[![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
+
 Agents (and the humans driving them) defer things in conversation all the time: *"we'll test
 that once X lands"*, *"revisit after the refactor"*, *"do it later"*. A deferral without a
 real trigger is a **silent kill** — sessions end, context dies, and nothing ever comes back
@@ -36,6 +39,28 @@ The name is the crime: the phrase this tool polices is the phrase that invokes i
 - **Malformed rows are red, never invisible**: wrong column count, empty fields, bad status,
   bad dates — all surface as MALFORMED (scan exit 1, `doctor` finding). A commitment that
   quietly disappears is the exact failure this tool exists to prevent.
+
+## 60-second demo (abridged real transcript)
+
+```console
+$ scan.sh add someday-refactor --action "refactor once the architecture matures"
+REJECT someday-refactor: no machine-decidable condition — give --due/--check, do it now, or kill it honestly
+
+$ scan.sh scan
+DUE  fix-flaky-timer — revisit the flaky timer test
+     context: tests/timer.spec.ts; repro: run 20x; suspect: fake-clock drift
+     cond: due=2026-08-15 | source: "we'll fix it later" in PR #88 review
+-- pm-ledger: 1 due, 0 invalid, 0 malformed (of 3 pending) --
+```
+
+Then a **new session** opens. Nobody mentions the ledger — the opening prompt is just
+*"start today's work"*. The SessionStart hook injects the due rows, and the agent's first
+reply plans them first, closing verb included:
+
+> **Start now:** `fix-flaky-timer` — debug the timer test, run 20×, verify the fake-clock
+> drift fix … then `scan.sh done fix-flaky-timer`.
+
+It didn't remember. It got tripped.
 
 ## Install
 
