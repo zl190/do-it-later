@@ -2,8 +2,8 @@
 
 > ### Your agent forgets its promises. The machine doesn't.
 >
-> Every *"I'll do that later"* your agent says lands in a ledger — and comes back on its
-> own when it's due.
+> Let every *"I'll do that later"* your agent says land in a ledger — and come back on
+> its own when it's due.
 
 [![ci](https://img.shields.io/github/actions/workflow/status/zl190/do-it-later/ci.yml?style=flat-square&label=ci)](https://github.com/zl190/do-it-later/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/zl190/do-it-later?style=flat-square)](LICENSE)
