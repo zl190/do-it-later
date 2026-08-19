@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [0.2.0] - 2026-08-19
+
+### Added
+- `face` verb: the ledger as a self-contained HTML page (condition column, stakes chips,
+  click-to-copy fire buttons; light theme with dark auto-variant). Lifecycle demo GIF.
+- Plugin packaging: `.claude-plugin/plugin.json` + `hooks/hooks.json` +
+  self-marketplace, so `claude plugin install do-it-later@do-it-later` ships the skill
+  AND auto-registers the SessionStart hook (verified live: both-hook double-fire test).
+- skills CLI compatibility (`npx skills add zl190/do-it-later`); install.sh now detects
+  in-place installs and skips the self-referential symlink.
+- Composition seams documented (inbound sweep API, outbound cold-start work orders,
+  `PM_LEDGER` as the composition point) and per-repo todo_or_die mode with a CI recipe.
+
 ## [0.1.0] - 2026-08-19
 
 ### Added

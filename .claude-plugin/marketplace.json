@@ -1,0 +1,12 @@
+{
+  "name": "do-it-later",
+  "owner": { "name": "zl190", "url": "https://github.com/zl190" },
+  "plugins": [
+    {
+      "name": "do-it-later",
+      "source": ".",
+      "description": "A read-it-later for agents, with context and a trigger. Ships the skill plus the SessionStart ignition hook — no manual settings.json editing.",
+      "license": "MIT"
+    }
+  ]
+}

@@ -61,17 +61,31 @@ The TSV stays the single source of truth; the page is a throwaway projection.
 
 ## Install
 
-Requires: bash, awk, python3 (install script only). Claude Code as the host harness.
+Three ways, pick one. Claude Code as the host harness.
+
+**Plugin (recommended — the SessionStart hook registers itself, nothing edits your config):**
+
+```bash
+claude plugin marketplace add zl190/do-it-later
+claude plugin install do-it-later@do-it-later --scope user
+```
+
+**skills CLI:**
+
+```bash
+npx skills add zl190/do-it-later -g
+~/.claude/skills/do-it-later/install.sh   # once, to register the hook (needs python3)
+```
+
+**Manual:**
 
 ```bash
 git clone https://github.com/zl190/do-it-later ~/do-it-later
 ~/do-it-later/install.sh
 ```
 
-`install.sh` does exactly two things, idempotently: symlinks the repo into
-`~/.claude/skills/do-it-later`, and registers the SessionStart hook in
-`~/.claude/settings.json` (backing the file up first to `settings.json.bak.<timestamp>`).
-`uninstall.sh` reverses both. New settings take effect from the next session.
+`install.sh` is idempotent and backs up `settings.json` before touching it; `uninstall.sh`
+reverses it. New hooks take effect from the next session.
 
 Verify:
 

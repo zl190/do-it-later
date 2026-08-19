@@ -1,0 +1,12 @@
+{
+  "name": "do-it-later",
+  "displayName": "Do It Later",
+  "version": "0.2.0",
+  "description": "A read-it-later for agents, with context and a trigger. Deferred promises land in a machine-scannable ledger and come back on their own when due.",
+  "author": { "name": "zl190", "url": "https://github.com/zl190" },
+  "repository": "https://github.com/zl190/do-it-later",
+  "homepage": "https://github.com/zl190/do-it-later",
+  "license": "MIT",
+  "keywords": ["prospective-memory", "deferral", "todo-or-die", "ledger", "hooks"],
+  "hooks": "./hooks/hooks.json"
+}
